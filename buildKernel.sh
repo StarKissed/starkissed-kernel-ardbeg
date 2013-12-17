@@ -30,7 +30,7 @@ fi
 cat config/shieldtablet_defconfig config/starkissed_defconfig > arch/arm/configs/tegra12_android_defconfig
 
 make -j$CPU_JOB_NUM clean CROSS_COMPILE=$TOOLCHAIN_PREFIX
-make tegra12_android_defconfig -j$CPU_JOB_NUM -j$CPU_JOB_NUM ARCH=arm CROSS_COMPILE=$TOOLCHAIN_PREFIX
+make tegra12_android_defconfig -j$CPU_JOB_NUM ARCH=arm CROSS_COMPILE=$TOOLCHAIN_PREFIX
 make tegra124-tn8-p1761-1270-a04-e-battery.dtb -j$CPU_JOB_NUM ARCH=arm CROSS_COMPILE=$TOOLCHAIN_PREFIX
 make -j$CPU_JOB_NUM ARCH=arm CROSS_COMPILE=$TOOLCHAIN_PREFIX
 
