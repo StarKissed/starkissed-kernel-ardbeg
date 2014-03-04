@@ -9,7 +9,7 @@ PROPER=`echo $1 | sed 's/\([a-z]\)\([a-zA-Z0-9]*\)/\u\1\2/g'`
 HANDLE=LoungeKatt
 KERNELREPO=$DROPBOX_SERVER/TwistedServer/StarKissed/kernels
 TOOLCHAIN_PREFIX=/Volumes/android/android-toolchain-eabi-4.7/bin/arm-eabi-
-MODULEOUT=buildimg/boot.img-ramdisk
+MODULEOUT=starkissed/system
 GOOSERVER=loungekatt@upload.goo.im:public_html
 PUNCHCARD=`date "+%m-%d-%Y_%H.%M"`
 
@@ -75,13 +75,7 @@ if [ -e arch/arm/boot/zImage ]; then
     ./img.sh
     cd ../
 
-    IMAGEFILE=boot-lp.$PUNCHCARD.img
     KENRELZIP="StarKissed-LP50_$PUNCHCARD-Ardberg.zip"
-
-    cp -r  buildimg/boot.img $KERNELREPO/shieldtablet/boot-50.img
-    cp -r  $KERNELREPO/shieldtablet/boot-50.img ~/.goo/$IMAGEFILE
-    scp ~/.goo/$IMAGEFILE $GOOSERVER/shieldtablet/kernel
-    rm -R ~/.goo/$IMAGEFILE
 
     echo "building boot package"
     cp -R buildimg/boot.img starkissed
