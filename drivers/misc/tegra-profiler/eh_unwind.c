@@ -1141,6 +1141,7 @@ int quadd_unwind_start(struct task_struct *task)
 {
 	int err;
 	struct regions_data *rd, *rd_old;
+	rd = rd_alloc(QUADD_EXTABS_SIZE);
 
 	rd = rd_alloc(QUADD_EXTABS_SIZE);
 	if (IS_ERR_OR_NULL(rd)) {
