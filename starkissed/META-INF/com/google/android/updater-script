@@ -1,0 +1,33 @@
+ui_print(" ");
+ui_print("===============================================");
+ui_print("|                                             |");
+ui_print("|        Nvidia Shield StarKissed Kernel      |");
+ui_print("|               for Android 4.3               |");
+ui_print("|        sourced from Nvidia, coolbho         |");
+ui_print("|            xda, & twistedumbrella           |");
+ui_print("|                                             |");
+ui_print("===============================================");
+ui_print(" ");
+
+ui_print(">>> Mounting /system /data ...");
+run_program("/sbin/busybox", "mount", "/system");
+run_program("/sbin/busybox", "mount", "/data");
+ui_print(" ");
+
+ui_print(">>> Installing System ...");
+package_extract_dir("system", "/system");
+ui_print(" ");
+
+ui_print(">>> Unmounting /system /data ...");
+run_program("/sbin/busybox", "umount", "/system");
+run_program("/sbin/busybox", "umount", "/data");
+ui_print(" ");
+
+ui_print(">>> Installing Kernel...");
+package_extract_file("boot.img", "/tmp/boot.img");
+set_perm(0, 0, 0777, "/tmp/boot.img");
+run_program("/sbin/busybox", "dd", "if=/tmp/boot.img", "of=/dev/block/platform/sdhci-tegra.3/by-name/LNX");
+ui_print(" ");
+
+ui_print(">>> Done!");
+ui_print(" ");
