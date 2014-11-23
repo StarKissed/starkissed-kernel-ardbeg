@@ -30,10 +30,10 @@ if [ -e buildimg/zImage ]; then
 rm -R buildimg/zImage
 fi
 
-make -j$CPU_JOB_NUM -C $(pwd) clean CROSS_COMPILE=$TOOLCHAIN_PREFIX
-make -j$CPU_JOB_NUM -C $(pwd) tegra12_android_defconfig -j$CPU_JOB_NUM ARCH=arm CROSS_COMPILE=$TOOLCHAIN_PREFIX
-make -j$CPU_JOB_NUM -C $(pwd) tegra124-ardbeg.dtb ARCH=arm CROSS_COMPILE=$TOOLCHAIN_PREFIX
-make -j$CPU_JOB_NUM -C $(pwd) ARCH=arm CROSS_COMPILE=$TOOLCHAIN_PREFIX
+make -j$CPU_JOB_NUM clean CROSS_COMPILE=$TOOLCHAIN_PREFIX
+make tegra12_android_defconfig -j$CPU_JOB_NUM -j$CPU_JOB_NUM ARCH=arm CROSS_COMPILE=$TOOLCHAIN_PREFIX
+make tegra124-ardbeg.dtb -j$CPU_JOB_NUM ARCH=arm CROSS_COMPILE=$TOOLCHAIN_PREFIX
+make -j$CPU_JOB_NUM ARCH=arm CROSS_COMPILE=$TOOLCHAIN_PREFIX
 
 if [ -e arch/arm/boot/zImage ]; then
 
@@ -60,7 +60,8 @@ if [ -e arch/arm/boot/zImage ]; then
 
     fi
 
-cat arch/arm/boot/zImage arch/arm/boot/tegra124-ardbeg.dtb > buildimg/zImage
+    cp -r arch/arm/boot/dts/tegra124-ardbeg.dtb buildimg/tegra124-ardbeg.dtb
+    cp -r arch/arm/boot/zImage buildimg/zImage
 
     cd buildimg
     ./img.sh
@@ -75,7 +76,7 @@ cat arch/arm/boot/zImage arch/arm/boot/tegra124-ardbeg.dtb > buildimg/zImage
     rm -R ~/.goo/$IMAGEFILE
 
     echo "building boot package"
-    cp -R boot.img starkissed
+    cp -R buildimg/boot.img starkissed
     cd starkissed
     rm *.zip
     zip -r $zipfile *
@@ -88,5 +89,3 @@ cat arch/arm/boot/zImage arch/arm/boot/tegra124-ardbeg.dtb > buildimg/zImage
     fi
 
 fi
-
-cd $KERNELSPEC
