@@ -96,6 +96,8 @@ arch/arm/boot/compressed/ashldi3.S
 arch/arm/boot/compressed/piggy.xzkern
 arch/arm/boot/zImage
 
+0
+
 *.dtb
 *.dts
 
@@ -103,6 +105,4 @@ arch/arm/boot/zImage
 */*.img
 */*.zip
 
-0
-out
-output
+tegra12_android_defconfig
