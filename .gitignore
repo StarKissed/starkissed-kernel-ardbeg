@@ -106,3 +106,4 @@ arch/arm/boot/zImage
 */*.zip
 
 tegra12_android_defconfig
+buildimg/zImage_dtb
