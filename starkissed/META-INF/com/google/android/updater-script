@@ -1,12 +1,15 @@
 ui_print(" ");
-ui_print("===============================================");
-ui_print("|                                             |");
-ui_print("|        Nvidia Shield StarKissed Kernel      |");
-ui_print("|               for Android 4.3               |");
-ui_print("|        sourced from Nvidia, coolbho         |");
-ui_print("|            xda, & twistedumbrella           |");
-ui_print("|                                             |");
-ui_print("===============================================");
+ui_print("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-");
+ui_print("                   _   _             ...    ");
+ui_print("      ___          \\-//`       o,*,(o o)   ");
+ui_print("     (o o)         (o o)       8(o o)(_)Ooo ");
+ui_print(" ooO--(_)--Ooo-ooO--(_)--Ooo-ooO-(_)---Ooo  ");
+ui_print("    ____  __  __  ___  ____  _____  _  _    ");
+ui_print("   ( ___)(  )(  )/ __)(_  _)(  _  )( \( )   ");
+ui_print("    )__)  )(__)( \__ \ _)(_  )(_)(  )  (    ");
+ui_print("   (__)  (______)(___/(____)(_____)(_)\_)   ");
+ui_print("                                            ");
+ui_print("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-");
 ui_print(" ");
 
 ui_print(">>> Mounting /system /data ...");
