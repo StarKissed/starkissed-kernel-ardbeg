@@ -7,7 +7,7 @@
 PROPER=`echo $1 | sed 's/\([a-z]\)\([a-zA-Z0-9]*\)/\u\1\2/g'`
 
 HANDLE=LoungeKatt
-KERNELREPO=$DROPBOX_SERVER/TwistedServer/Playground/kernels
+KERNELREPO=$DROPBOX_SERVER/TwistedServer/StarKissed/kernels
 TOOLCHAIN_PREFIX=/Volumes/android/android-toolchain-eabi-4.7/bin/arm-eabi-
 MODULEOUT=buildimg/boot.img-ramdisk
 GOOSERVER=loungekatt@upload.goo.im:public_html
@@ -20,14 +20,20 @@ CORES=`sysctl -a | grep machdep.cpu | grep core_count | awk '{print $2}'`
 THREADS=`sysctl -a | grep machdep.cpu | grep thread_count | awk '{print $2}'`
 CPU_JOB_NUM=$((($CORES * $THREADS) / 2))
 
+if [ -e .config ]; then
+rm -rf .config
+fi
 if [ -e buildimg/boot.img ]; then
-rm -R buildimg/boot.img
+rm -rf buildimg/boot.img
 fi
 if [ -e buildimg/newramdisk.cpio.gz ]; then
-rm -R buildimg/newramdisk.cpio.gz
+rm -rf buildimg/newramdisk.cpio.gz
 fi
 if [ -e buildimg/zImage ]; then
-rm -R buildimg/zImage
+rm -rf buildimg/zImage
+fi
+if [ -e skrecovery/$zipfile ];then
+rm -rf skrecovery/$zipfile
 fi
 
 cat config/shieldtablet_defconfig config/starkissed_defconfig > arch/arm/configs/tegra12_android_defconfig
