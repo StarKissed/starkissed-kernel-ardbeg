@@ -26,10 +26,21 @@ run_program("/sbin/busybox", "umount", "/system");
 run_program("/sbin/busybox", "umount", "/data");
 ui_print(" ");
 
-ui_print(">>> Installing Kernel...");
-package_extract_file("boot.img", "/tmp/boot.img");
+if getprop("ro.product.name") == "wx_na_wf" then ui_print(">>> Installing WiFi Kernel");
+package_extract_file("kernel/wx_na_wf/boot.img", "/tmp/boot.img");
 set_perm(0, 0, 0777, "/tmp/boot.img");
 run_program("/sbin/busybox", "dd", "if=/tmp/boot.img", "of=/dev/block/platform/sdhci-tegra.3/by-name/LNX");
+endif;
+if getprop("ro.product.name") == "wx_na_do" then ui_print(">>> Installing LTE-US Kernel");
+package_extract_file("kernel/wx_na_do/boot.img", "/tmp/boot.img");
+set_perm(0, 0, 0777, "/tmp/boot.img");
+run_program("/sbin/busybox", "dd", "if=/tmp/boot.img", "of=/dev/block/platform/sdhci-tegra.3/by-name/LNX");
+endif;
+if getprop("ro.product.name") == "wx_un_do" then ui_print(">>> Installing LTE-EU Kernel");
+package_extract_file("kernel/wx_un_do/boot.img", "/tmp/boot.img");
+set_perm(0, 0, 0777, "/tmp/boot.img");
+run_program("/sbin/busybox", "dd", "if=/tmp/boot.img", "of=/dev/block/platform/sdhci-tegra.3/by-name/LNX");
+endif;
 ui_print(" ");
 
 ui_print(">>> Done!");
