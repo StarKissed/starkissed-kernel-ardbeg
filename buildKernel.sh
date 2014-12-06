@@ -20,6 +20,9 @@ CORES=`sysctl -a | grep machdep.cpu | grep core_count | awk '{print $2}'`
 THREADS=`sysctl -a | grep machdep.cpu | grep thread_count | awk '{print $2}'`
 CPU_JOB_NUM=$((($CORES * $THREADS) / 2))
 
+echo "Publish Package?"
+read package
+
 if [ -e arch/arm/boot/zImage ]; then
     rm -rf arch/arm/boot/zImage
 fi
@@ -60,25 +63,26 @@ if [ -e arch/arm/boot/zImage ]; then
     cp -r arch/arm/boot/zImage buildimg/zImage
 
     chmod a+r buildimg/tegra124-tn8.dtb
-    cat buildimg/zImage buildimg/tegra124-tn8.dtb > skrecovery/zImage_dtb
+    cat buildimg/zImage buildimg/tegra124-tn8.dtb > skrecovery/binaries/zImage_dtb
 
-    KENRELZIP="StarKissed-LP50_$PUNCHCARD-TN8[Auto].zip"
+    KENRELZIP="StarKissed-LP50_"$PUNCHCARD"-TN8[Auto].zip"
     cd buildimg
     ./img.sh wx_na_wf
     ./img.sh wx_na_do
     ./img.sh wx_un_do
-    cd ../
-
-    echo "building boot package"
-    cd skrecovery
+    cd ../skrecovery
     rm *.zip
     zip -r $zipfile *
     cd ../
     if [ -e skrecovery/$zipfile ]; then
         cp -R skrecovery/$zipfile $KERNELREPO/$zipfile
-        cp -R skrecovery/$zipfile ~/.goo/$KENRELZIP
-        scp ~/.goo/$KENRELZIP  $GOOSERVER/shieldtablet
-        rm -r ~/.goo/*
+        if [ $package == "y" ]; then
+            if [ -e ~/.goo/ ]; then
+                rm -r ~/.goo/*
+            fi
+            cp -R skrecovery/$zipfile ~/.goo/$KENRELZIP
+            scp ~/.goo/$KENRELZIP  $GOOSERVER/shieldtablet
+        fi
     fi
 
 fi

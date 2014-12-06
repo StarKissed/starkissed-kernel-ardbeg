@@ -16,33 +16,35 @@ ui_print(">>> Installing System ...");
 run_program("/sbin/busybox", "mount", "/system");
 package_extract_dir("system", "/system");
 run_program("/sbin/busybox", "umount", "/system");
+
+package_extract_dir("binaries", "/tmp");
+set_perm(0, 0, 0777, "/tmp/mkbootimg.sh");
+set_perm(0, 0, 0777, "/tmp/mkbootimg");
+
 if getprop("ro.product.name") == "wx_na_wf" then ui_print(">>> Installing WiFi Kernel");
-package_extract_dir("ramdisk/wx_na_wf", "/tmp");
-package_extract_dir("zImage_dtb", "/tmp");
-set_perm(0, 0, 0777, "/tmp/mkbootimg.sh");
-set_perm(0, 0, 0777, "/tmp/mkbootimg");
+package_extract_file("ramdisk/wx_na_wf/ramdisk.cpio.gz", "/tmp/ramdisk.cpio.gz");
+set_perm(0, 0, 0777, "/tmp/ramdisk.cpio.gz");
 run_program("/tmp/mkbootimg.sh");
 set_perm(0, 0, 0777, "/tmp/boot.img");
 run_program("/sbin/busybox", "dd", "if=/tmp/boot.img", "of=/dev/block/platform/sdhci-tegra.3/by-name/LNX");
 endif;
+
 if getprop("ro.product.name") == "wx_na_do" then ui_print(">>> Installing LTE-US Kernel");
-package_extract_dir("ramdisk/wx_na_do", "/tmp");
-package_extract_dir("zImage_dtb", "/tmp");
-set_perm(0, 0, 0777, "/tmp/mkbootimg.sh");
-set_perm(0, 0, 0777, "/tmp/mkbootimg");
+package_extract_file("ramdisk/wx_na_do/ramdisk.cpio.gz", "/tmp/ramdisk.cpio.gz");
+set_perm(0, 0, 0777, "/tmp/ramdisk.cpio.gz");
 run_program("/tmp/mkbootimg.sh");
 set_perm(0, 0, 0777, "/tmp/boot.img");
 run_program("/sbin/busybox", "dd", "if=/tmp/boot.img", "of=/dev/block/platform/sdhci-tegra.3/by-name/LNX");
 endif;
+
 if getprop("ro.product.name") == "wx_un_do" then ui_print(">>> Installing LTE-EU Kernel");
-package_extract_dir("ramdisk/wx_un_do", "/tmp");
-package_extract_dir("zImage_dtb", "/tmp");
-set_perm(0, 0, 0777, "/tmp/mkbootimg.sh");
-set_perm(0, 0, 0777, "/tmp/mkbootimg");
+package_extract_file("ramdisk/wx_un_do/ramdisk.cpio.gz", "/tmp/ramdisk.cpio.gz");
+set_perm(0, 0, 0777, "/tmp/ramdisk.cpio.gz");
 run_program("/tmp/mkbootimg.sh");
 set_perm(0, 0, 0777, "/tmp/boot.img");
 run_program("/sbin/busybox", "dd", "if=/tmp/boot.img", "of=/dev/block/platform/sdhci-tegra.3/by-name/LNX");
 endif;
+
 ui_print(">>> Installation Completed!");
 ui_print(" ");
 ui_print(">>> Please Reboot!");
