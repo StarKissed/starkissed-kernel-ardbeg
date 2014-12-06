@@ -9,7 +9,7 @@ PROPER=`echo $1 | sed 's/\([a-z]\)\([a-zA-Z0-9]*\)/\u\1\2/g'`
 HANDLE=LoungeKatt
 KERNELREPO=$DROPBOX_SERVER/TwistedServer/StarKissed/kernels
 TOOLCHAIN_PREFIX=/Volumes/android/android-toolchain-eabi-4.7/bin/arm-eabi-
-MODULEOUT=starkissed/system
+MODULEOUT=skrecovery/system
 GOOSERVER=loungekatt@upload.goo.im:public_html
 PUNCHCARD=`date "+%m-%d-%Y_%H.%M"`
 
@@ -20,17 +20,8 @@ CORES=`sysctl -a | grep machdep.cpu | grep core_count | awk '{print $2}'`
 THREADS=`sysctl -a | grep machdep.cpu | grep thread_count | awk '{print $2}'`
 CPU_JOB_NUM=$((($CORES * $THREADS) / 2))
 
-if [ -e buildimg/tegra124-tn8.dtb ]; then
-rm -rf buildimg/tegra124-tn8.dtb
-fi
-if [ -e buildimg/zImage ]; then
-rm -rf buildimg/zImage
-fi
 if [ -e arch/arm/boot/zImage ]; then
-rm -rf arch/arm/boot/zImage
-fi
-if [ -e skrecovery/$zipfile ];then
-rm -rf skrecovery/$zipfile
+    rm -rf arch/arm/boot/zImage
 fi
 
 cat config/shieldtablet_defconfig config/starkissed_defconfig > arch/arm/configs/tegra12_android_defconfig
@@ -68,24 +59,24 @@ if [ -e arch/arm/boot/zImage ]; then
     cp -r arch/arm/boot/dts/tegra124-tn8-p1761-1270-a04-e-battery.dtb buildimg/tegra124-tn8.dtb
     cp -r arch/arm/boot/zImage buildimg/zImage
 
+    chmod a+r buildimg/tegra124-tn8.dtb
+    cat buildimg/zImage buildimg/tegra124-tn8.dtb > skrecovery/zImage_dtb
+
     KENRELZIP="StarKissed-LP50_$PUNCHCARD-TN8[Auto].zip"
     cd buildimg
-    ./img.sh wifi
-    cp -R boot.img ../starkissed/kernel/wx_na_wf
-    ./img.sh ltea
-    cp -R boot.img ../starkissed/kernel/wx_na_do
-    ./img.sh lteu
-    cp -R boot.img ../starkissed/kernel/wx_un_do
+    ./img.sh wx_na_wf
+    ./img.sh wx_na_do
+    ./img.sh wx_un_do
     cd ../
 
     echo "building boot package"
-    cd starkissed
+    cd skrecovery
     rm *.zip
     zip -r $zipfile *
     cd ../
-    cp -R starkissed/$zipfile $KERNELREPO/$zipfile
-    if [ -e $KERNELREPO/$zipfile ]; then
-        cp -R $KERNELREPO/$zipfile ~/.goo/$KENRELZIP
+    if [ -e skrecovery/$zipfile ]; then
+        cp -R skrecovery/$zipfile $KERNELREPO/$zipfile
+        cp -R skrecovery/$zipfile ~/.goo/$KENRELZIP
         scp ~/.goo/$KENRELZIP  $GOOSERVER/shieldtablet
         rm -r ~/.goo/*
     fi

@@ -105,9 +105,14 @@ arch/arm/boot/zImage
 */*.img
 */*.zip
 
+zImage_dtb
 boot.img
 
 tegra12_android_defconfig
 buildimg/zImage_dtb
 
 arch/arm/configs/tegra12_android_defconfig
+
+buildimg/wx_na_wf-ramdisk
+buildimg/wx_na_do-ramdisk
+buildimg/wx_un_do-ramdisk
