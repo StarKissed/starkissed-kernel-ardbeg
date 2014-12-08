@@ -24,7 +24,7 @@ echo "Publish Package?"
 read package
 
 if [ -e arch/arm/boot/zImage ]; then
-    rm -rf arch/arm/boot/zImage
+    rm arch/arm/boot/zImage
 fi
 
 cat config/shieldtablet_defconfig config/starkissed_defconfig > arch/arm/configs/tegra12_android_defconfig
@@ -84,5 +84,4 @@ if [ -e arch/arm/boot/zImage ]; then
             scp ~/.goo/$KENRELZIP  $GOOSERVER/shieldtablet
         fi
     fi
-
 fi
