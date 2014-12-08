@@ -108,6 +108,33 @@ config CPU_FREQ_DEFAULT_GOV_INTERACTIVE
 	  loading your cpufreq low-level hardware driver, using the
 	  'interactive' governor for latency-sensitive workloads.
 
+config CPU_FREQ_DEFAULT_GOV_YANKACTIVE
+	bool "yankactive"
+	select CPU_FREQ_GOV_YANKACTIVE
+	help
+	  Use the CPUFreq governor 'yankactive' as default. This allows
+	  you to get a full dynamic cpu frequency capable system by simply
+	  loading your cpufreq low-level hardware driver, using the
+	  'yankactive' governor for latency-sensitive workloads.
+
+config CPU_FREQ_DEFAULT_GOV_DANCEDANCE
+            bool "dancedance"
+            select CPU_FREQ_GOV_DANCEDANCE
+            help
+              Use the CPUFreq governor 'dancedance' as default.
+
+config CPU_FREQ_DEFAULT_GOV_LIONHEART
+            bool "lionheart"
+            select CPU_FREQ_GOV_LIONHEART
+            help
+              Use the CPUFreq governor 'lionheart' as default.
+
+config CPU_FREQ_DEFAULT_GOV_SMARTMAX
+            bool "smartmax"
+            select CPU_FREQ_GOV_SMARTMAX
+            help
+              Use the CPUFreq governor 'smartmax' as default.
+
 endchoice
 
 config CPU_FREQ_GOV_PERFORMANCE
@@ -181,6 +208,37 @@ config CPU_FREQ_GOV_INTERACTIVE
 	  For details, take a look at linux/Documentation/cpu-freq.
 
 	  If in doubt, say N.
+
+config CPU_FREQ_GOV_YANKACTIVE
+	tristate "'yankactive' cpufreq policy governor"
+	help
+	  'yankactive' - This driver adds a dynamic cpufreq policy governor
+	  designed for latency-sensitive workloads.
+
+	  The governor is based on interactive with just different default settings
+	  and can be achieved using interactive with a script. This is added for
+	  simplification purposes for myself.
+
+config CPU_FREQ_GOV_DANCEDANCE
+           tristate "'dancedance' cpufreq governor"
+           depends on CPU_FREQ
+           help
+             dancedance' - a "smart" optimized governor!
+             If in doubt, say N.
+
+config CPU_FREQ_GOV_LIONHEART
+           tristate "'lionheart' cpufreq governor"
+           depends on CPU_FREQ
+           help
+             lionheart' - a "smart" optimized governor!
+             If in doubt, say N.
+
+config CPU_FREQ_GOV_SMARTMAX
+           tristate "'smartmax' cpufreq governor"
+           depends on CPU_FREQ
+           help
+             smartmax' - a "smart" optimized governor!
+             If in doubt, say N.
 
 config CPU_FREQ_GOV_CONSERVATIVE
 	tristate "'conservative' cpufreq governor"
