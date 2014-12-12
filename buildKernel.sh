@@ -61,6 +61,9 @@ if [ -e arch/arm/boot/zImage ]; then
 
     cp -r arch/arm/boot/dts/tegra124-tn8-p1761-1270-a04-e-battery.dtb buildimg/tegra124-tn8.dtb
     cp -r arch/arm/boot/zImage buildimg/zImage
+    for k in $(find skrecovery -name "system"); do
+        cp -R buildimg/system/etc "${k}"
+    done
 
     chmod a+r buildimg/tegra124-tn8.dtb
     cat buildimg/zImage buildimg/tegra124-tn8.dtb > skrecovery/binaries/zImage_dtb
