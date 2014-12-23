@@ -5,7 +5,7 @@
 # This script is designed by Twisted Playground for use on MacOSX 10.7 but can be modified for other distributions of Mac and Linux
 
 PROPER=`echo $1 | sed 's/\([a-z]\)\([a-zA-Z0-9]*\)/\u\1\2/g'`
-
+KERNELDIR=`pwd`
 HANDLE=LoungeKatt
 KERNELREPO=$DROPBOX_SERVER/TwistedServer/StarKissed/kernels
 TOOLCHAIN_PREFIX=/Volumes/android/android-toolchain-eabi-4.7/bin/arm-eabi-
@@ -13,13 +13,14 @@ MODULEOUT=skrecovery/system
 GOOSERVER=loungekatt@upload.goo.im:public_html
 PUNCHCARD=`date "+%m-%d-%Y_%H.%M"`
 
-zipfile=$HANDLE"_StarKissed-LP50-TN8[Auto].zip"
+zipfile=$HANDLE"_StarKissed-LP50-TN8-Auto.zip"
 
 # CPU_JOB_NUM=`grep processor /proc/cpuinfo|wc -l`
 CORES=`sysctl -a | grep machdep.cpu | grep core_count | awk '{print $2}'`
 THREADS=`sysctl -a | grep machdep.cpu | grep thread_count | awk '{print $2}'`
 CPU_JOB_NUM=$((($CORES * $THREADS) / 2))
 
+echo
 echo "Publish Package?"
 read package
 
@@ -88,3 +89,5 @@ if [ -e arch/arm/boot/zImage ]; then
         fi
     fi
 fi
+
+cd $KERNELDIR
