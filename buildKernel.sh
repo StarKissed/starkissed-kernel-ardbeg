@@ -69,7 +69,7 @@ if [ -e arch/arm/boot/zImage ]; then
     chmod a+r buildimg/tegra124-tn8.dtb
     cat buildimg/zImage buildimg/tegra124-tn8.dtb > skrecovery/binaries/zImage_dtb
 
-    KENRELZIP="StarKissed-LP50_"$PUNCHCARD"-TN8[Auto].zip"
+    KENRELZIP="StarKissed-LP50_"$PUNCHCARD"-TN8-Auto.zip"
     cd buildimg
     ./img.sh wx_na_wf
     ./img.sh wx_na_do
@@ -85,7 +85,9 @@ if [ -e arch/arm/boot/zImage ]; then
                 rm -r ~/.goo/*
             fi
             cp -R skrecovery/$zipfile ~/.goo/$KENRELZIP
+            existing=`ssh upload.goo.im ls $KERNELHOST/StarKissed*Auto*.zip`
             scp ~/.goo/$KENRELZIP  $GOOSERVER/shieldtablet
+            ssh upload.goo.im rm $existing
         fi
     fi
 fi
