@@ -29,11 +29,6 @@ on init
 
 #Raydium touch setting
 service rm_ts_service    /vendor/bin/rm_ts_server
-    disabled
-    class late_start
+    class main
     user system
     group system input
-
-on property:ro.boot.touch_vendor_id=0
-    start rm_ts_service
-

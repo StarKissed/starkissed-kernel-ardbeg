@@ -10,7 +10,8 @@ HANDLE=LoungeKatt
 KERNELREPO=$DROPBOX_SERVER/TwistedServer/StarKissed/kernels
 TOOLCHAIN_PREFIX=/Volumes/android/android-toolchain-eabi-4.7/bin/arm-eabi-
 MODULEOUT=skrecovery/system
-GOOSERVER=loungekatt@upload.goo.im:public_html
+KERNELHOST=public_html/shieldtablet
+GOOSERVER=upload.goo.im:$KERNELHOST
 PUNCHCARD=`date "+%m-%d-%Y_%H.%M"`
 
 zipfile=$HANDLE"_StarKissed-LP50-TN8-Auto.zip"

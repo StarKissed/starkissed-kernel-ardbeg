@@ -365,6 +365,7 @@
 
 # Tsec
 /dev/nvhost-tsec			u:object_r:tsec_device:s0
+/dev/nvhost-tsecb			u:object_r:tsec_device:s0
 
 # Nvdec
 /dev/nvhost-nvdec			u:object_r:video_device:s0
