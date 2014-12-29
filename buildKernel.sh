@@ -87,7 +87,7 @@ if [ -e arch/arm/boot/zImage ]; then
             fi
             cp -R skrecovery/$zipfile ~/.goo/$KENRELZIP
             existing=`ssh upload.goo.im ls $KERNELHOST/StarKissed*Auto*.zip`
-            scp ~/.goo/$KENRELZIP  $GOOSERVER/shieldtablet
+            scp ~/.goo/$KENRELZIP  $GOOSERVER
             ssh upload.goo.im rm $existing
         fi
     fi
