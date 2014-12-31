@@ -139,7 +139,11 @@ void tegra_init_speedo_data(void)
 		return;
 	}
 
+#ifdef CONFIG_TEGRA_CPU_CAP_OVERCLOCK
+    cpu_speedo_0_value = 2500;
+#else
 	cpu_speedo_0_value = tegra_fuse_readl(FUSE_CPU_SPEEDO_0);
+#endif
 	cpu_speedo_1_value = tegra_fuse_readl(FUSE_CPU_SPEEDO_1);
 
 	/* GPU Speedo is stored in CPU_SPEEDO_2 */
@@ -153,7 +157,7 @@ void tegra_init_speedo_data(void)
 	soc_iddq_value = tegra_fuse_readl(FUSE_SOC_IDDQ);
 	gpu_iddq_value = tegra_fuse_readl(FUSE_GPU_IDDQ);
 
-	cpu_speedo_value = 2500; //cpu_speedo_0_value;
+	cpu_speedo_value = cpu_speedo_0_value;
 
 	if (cpu_speedo_value == 0) {
 		cpu_speedo_value = 2100;
