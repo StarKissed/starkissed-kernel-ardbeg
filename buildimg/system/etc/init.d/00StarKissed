@@ -1,7 +1,6 @@
 #!/system/bin/sh
-#
-# replace (u)random with erandom
-#
+
+# Frandom
 rm -f /dev/urandom
 ln -s /dev/erandom /dev/urandom
 rm -f /dev/random
@@ -11,5 +10,5 @@ ln -s /dev/erandom /dev/random
 mount -o remount,rw -t auto /data
 /starkissed/rngd
 sleep 2
-echo -8 > /proc/$(pgrep /starkissed/rngd)/oom_adj
-renice +8 /starkissed/rngd
+echo -8 > /proc/$(pgrep /sbin/sku/rngd)/oom_adj
+renice +8 /sbin/sku/rngd
