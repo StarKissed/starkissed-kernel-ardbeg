@@ -186,12 +186,6 @@ int elevator_init(struct request_queue *q, char *name)
 	struct elevator_type *e = NULL;
 	int err;
 
-	/*
-	 * q->sysfs_lock must be held to provide mutual exclusion between
-	 * elevator_switch() and here.
-	 */
-	lockdep_assert_held(&q->sysfs_lock);
-
 	if (unlikely(q->elevator))
 		return 0;
 
@@ -587,27 +581,27 @@ void elv_requeue_request(struct request_queue *q, struct request *rq)
  */
 int elv_reinsert_request(struct request_queue *q, struct request *rq)
 {
-    int res;
-    
-    if (!q->elevator->type->ops.elevator_reinsert_req_fn)
-        return -EPERM;
-    
-    res = q->elevator->type->ops.elevator_reinsert_req_fn(q, rq);
-    if (!res) {
-        /*
-         * it already went through dequeue, we need to decrement the
-         * in_flight count again
-         */
-        if (blk_account_rq(rq)) {
-            q->in_flight[rq_is_sync(rq)]--;
-            if (rq->cmd_flags & REQ_SORTED)
-                elv_deactivate_rq(q, rq);
-        }
-        rq->cmd_flags &= ~REQ_STARTED;
-        q->nr_sorted++;
-    }
-    
-    return res;
+	int res;
+
+	if (!q->elevator->type->ops.elevator_reinsert_req_fn)
+		return -EPERM;
+
+	res = q->elevator->type->ops.elevator_reinsert_req_fn(q, rq);
+	if (!res) {
+		/*
+		 * it already went through dequeue, we need to decrement the
+		 * in_flight count again
+		 */
+		if (blk_account_rq(rq)) {
+			q->in_flight[rq_is_sync(rq)]--;
+			if (rq->cmd_flags & REQ_SORTED)
+				elv_deactivate_rq(q, rq);
+		}
+		rq->cmd_flags &= ~REQ_STARTED;
+		q->nr_sorted++;
+	}
+
+	return res;
 }
 
 void elv_drain_elevator(struct request_queue *q)
@@ -786,6 +780,11 @@ void elv_completed_request(struct request_queue *q, struct request *rq)
 {
 	struct elevator_queue *e = q->elevator;
 
+	if (rq->cmd_flags & REQ_URGENT) {
+		q->notified_urgent = false;
+		WARN_ON(!q->dispatched_urgent);
+		q->dispatched_urgent = false;
+	}
 	/*
 	 * request is released from the driver, io must be done
 	 */
