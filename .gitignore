@@ -99,7 +99,6 @@ arch/arm/boot/zImage
 0
 
 *.dtb
-*.dts
 
 */zImage
 */*.img
