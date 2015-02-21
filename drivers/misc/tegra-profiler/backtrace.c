@@ -1,7 +1,7 @@
 /*
  * drivers/misc/tegra-profiler/backtrace.c
  *
- * Copyright (c) 2014, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2015, NVIDIA CORPORATION.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms and conditions of the GNU General Public License,
@@ -26,6 +26,7 @@
 #include "backtrace.h"
 #include "eh_unwind.h"
 #include "dwarf_unwind.h"
+#include "hrt.h"
 
 static inline int
 is_thumb_mode(struct pt_regs *regs)
@@ -92,7 +93,9 @@ int
 quadd_callchain_store(struct quadd_callchain *cc,
 		      unsigned long ip, unsigned int type)
 {
-	if (!validate_pc_addr(ip, sizeof(unsigned long))) {
+	unsigned long low_addr = cc->hrt->low_addr;
+
+	if (ip < low_addr || !validate_pc_addr(ip, sizeof(unsigned long))) {
 		cc->unw_rc = QUADD_URC_PC_INCORRECT;
 		return 0;
 	}

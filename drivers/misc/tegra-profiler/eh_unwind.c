@@ -1,7 +1,7 @@
 /*
  * drivers/misc/tegra-profiler/exh_tables.c
  *
- * Copyright (c) 2014, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2015, NVIDIA CORPORATION.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms and conditions of the GNU General Public License,
@@ -93,7 +93,7 @@ struct pin_pages_work {
 static struct quadd_unwind_ctx ctx;
 
 static inline int
-validate_mmap_addr(struct quadd_extabs_mmap *mmap,
+validate_mmap_addr(struct quadd_mmap_area *mmap,
 		   unsigned long addr, unsigned long nbytes)
 {
 	struct vm_area_struct *vma = mmap->mmap_vma;
@@ -119,7 +119,7 @@ validate_mmap_addr(struct quadd_extabs_mmap *mmap,
 
 #define read_user_data(addr, retval)				\
 ({								\
-	int ret;						\
+	long ret;						\
 								\
 	pagefault_disable();					\
 	ret = __get_user(retval, addr);				\
@@ -135,10 +135,12 @@ validate_mmap_addr(struct quadd_extabs_mmap *mmap,
 })
 
 static inline long
-read_mmap_data(struct quadd_extabs_mmap *mmap, const u32 *addr, u32 *retval)
+read_mmap_data(struct quadd_mmap_area *mmap, const u32 *addr, u32 *retval)
 {
-	if (!validate_mmap_addr(mmap, (unsigned long)addr, sizeof(u32)))
+	if (!validate_mmap_addr(mmap, (unsigned long)addr, sizeof(u32))) {
+		*retval = 0;
 		return -QUADD_URC_EACCESS;
+	}
 
 	*retval = *addr;
 	return 0;
@@ -393,7 +395,7 @@ static void rd_free_rcu(struct rcu_head *rh)
 }
 
 int quadd_unwind_set_extab(struct quadd_extables *extabs,
-			   struct quadd_extabs_mmap *mmap)
+			   struct quadd_mmap_area *mmap)
 {
 	int err = 0;
 	unsigned long nr_entries, nr_added, new_size;
@@ -401,6 +403,9 @@ int quadd_unwind_set_extab(struct quadd_extables *extabs,
 	struct extab_info *ti;
 	struct regions_data *rd, *rd_new;
 	struct ex_region_info *ex_entry;
+
+	if (mmap->type != QUADD_MMAP_TYPE_EXTABS)
+		return -EIO;
 
 	spin_lock(&ctx.lock);
 
@@ -534,7 +539,7 @@ error_out:
 }
 
 static int
-clean_mmap(struct regions_data *rd, struct quadd_extabs_mmap *mmap, int rm_ext)
+clean_mmap(struct regions_data *rd, struct quadd_mmap_area *mmap, int rm_ext)
 {
 	int nr_removed = 0;
 	struct ex_region_info *entry, *next;
@@ -553,7 +558,7 @@ clean_mmap(struct regions_data *rd, struct quadd_extabs_mmap *mmap, int rm_ext)
 	return nr_removed;
 }
 
-void quadd_unwind_delete_mmap(struct quadd_extabs_mmap *mmap)
+void quadd_unwind_delete_mmap(struct quadd_mmap_area *mmap)
 {
 	unsigned long nr_entries, nr_removed, new_size;
 	struct regions_data *rd, *rd_new;
@@ -632,7 +637,7 @@ unwind_find_idx(struct ex_region_info *ri, u32 addr)
 }
 
 static unsigned long
-unwind_get_byte(struct quadd_extabs_mmap *mmap,
+unwind_get_byte(struct quadd_mmap_area *mmap,
 		struct unwind_ctrl_block *ctrl, long *err)
 {
 	unsigned long ret;
@@ -662,11 +667,44 @@ unwind_get_byte(struct quadd_extabs_mmap *mmap,
 	return ret;
 }
 
+static long
+read_uleb128(struct quadd_mmap_area *mmap,
+	     struct unwind_ctrl_block *ctrl,
+	     unsigned long *ret)
+{
+	long err = 0;
+	unsigned long result;
+	unsigned char byte;
+	int shift, count;
+
+	result = 0;
+	shift = 0;
+	count = 0;
+
+	while (1) {
+		byte = unwind_get_byte(mmap, ctrl, &err);
+		if (err < 0)
+			return err;
+
+		count++;
+
+		result |= (byte & 0x7f) << shift;
+		shift += 7;
+
+		if (!(byte & 0x80))
+			break;
+	}
+
+	*ret = result;
+
+	return count;
+}
+
 /*
  * Execute the current unwind instruction.
  */
 static long
-unwind_exec_insn(struct quadd_extabs_mmap *mmap,
+unwind_exec_insn(struct quadd_mmap_area *mmap,
 		 struct unwind_ctrl_block *ctrl)
 {
 	long err;
@@ -690,7 +728,7 @@ unwind_exec_insn(struct quadd_extabs_mmap *mmap,
 			((insn & 0x3f) << 2) + 4, ctrl->vrs[SP]);
 	} else if ((insn & 0xf0) == 0x80) {
 		unsigned long mask;
-		u32 *vsp = (u32 *)(unsigned long)ctrl->vrs[SP];
+		u32 __user *vsp = (u32 __user *)(unsigned long)ctrl->vrs[SP];
 		int load_sp, reg = 4;
 
 		insn = (insn << 8) | unwind_get_byte(mmap, ctrl, &err);
@@ -726,7 +764,7 @@ unwind_exec_insn(struct quadd_extabs_mmap *mmap,
 		ctrl->vrs[SP] = ctrl->vrs[insn & 0x0f];
 		pr_debug("CMD_REG_TO_SP: vsp = {r%lu}\n", insn & 0x0f);
 	} else if ((insn & 0xf0) == 0xa0) {
-		u32 *vsp = (u32 *)(unsigned long)ctrl->vrs[SP];
+		u32 __user *vsp = (u32 __user *)(unsigned long)ctrl->vrs[SP];
 		unsigned int reg;
 
 		/* pop R4-R[4+bbb] */
@@ -757,7 +795,7 @@ unwind_exec_insn(struct quadd_extabs_mmap *mmap,
 		pr_debug("CMD_FINISH\n");
 	} else if (insn == 0xb1) {
 		unsigned long mask = unwind_get_byte(mmap, ctrl, &err);
-		u32 *vsp = (u32 *)(unsigned long)ctrl->vrs[SP];
+		u32 __user *vsp = (u32 __user *)(unsigned long)ctrl->vrs[SP];
 		int reg = 0;
 
 		if (err < 0)
@@ -785,17 +823,24 @@ unwind_exec_insn(struct quadd_extabs_mmap *mmap,
 		ctrl->vrs[SP] = (u32)(unsigned long)vsp;
 		pr_debug("new vsp: %#x\n", ctrl->vrs[SP]);
 	} else if (insn == 0xb2) {
-		unsigned long uleb128 = unwind_get_byte(mmap, ctrl, &err);
-		if (err < 0)
-			return err;
+		long count;
+		unsigned long uleb128 = 0;
+
+		count = read_uleb128(mmap, ctrl, &uleb128);
+		if (count < 0)
+			return count;
+
+		if (count == 0)
+			return -QUADD_URC_TBL_IS_CORRUPT;
 
 		ctrl->vrs[SP] += 0x204 + (uleb128 << 2);
 
-		pr_debug("CMD_DATA_POP: vsp = vsp + %lu, new vsp: %#x\n",
-			 0x204 + (uleb128 << 2), ctrl->vrs[SP]);
+		pr_debug("CMD_DATA_POP: vsp = vsp + %lu (%#lx), new vsp: %#x\n",
+			 0x204 + (uleb128 << 2), 0x204 + (uleb128 << 2),
+			 ctrl->vrs[SP]);
 	} else if (insn == 0xb3 || insn == 0xc8 || insn == 0xc9) {
 		unsigned long data, reg_from, reg_to;
-		u32 *vsp = (u32 *)(unsigned long)ctrl->vrs[SP];
+		u32 __user *vsp = (u32 __user *)(unsigned long)ctrl->vrs[SP];
 
 		data = unwind_get_byte(mmap, ctrl, &err);
 		if (err < 0)
@@ -824,7 +869,7 @@ unwind_exec_insn(struct quadd_extabs_mmap *mmap,
 	} else if ((insn & 0xf8) == 0xb8 || (insn & 0xf8) == 0xd0) {
 		unsigned long reg_to;
 		unsigned long data = insn & 0x07;
-		u32 *vsp = (u32 *)(unsigned long)ctrl->vrs[SP];
+		u32 __user *vsp = (u32 __user *)(unsigned long)ctrl->vrs[SP];
 
 		reg_to = 8 + data;
 
@@ -1141,7 +1186,6 @@ int quadd_unwind_start(struct task_struct *task)
 {
 	int err;
 	struct regions_data *rd, *rd_old;
-	rd = rd_alloc(QUADD_EXTABS_SIZE);
 
 	rd = rd_alloc(QUADD_EXTABS_SIZE);
 	if (IS_ERR_OR_NULL(rd)) {
