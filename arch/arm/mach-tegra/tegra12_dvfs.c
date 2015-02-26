@@ -148,7 +148,7 @@ void __init tegra12x_vdd_cpu_align(int step_uv, int offset_uv)
 /* CPU DVFS tables */
 static unsigned long cpu_max_freq[] = {
 /* speedo_id	0	 1	  2	   3	    4	     5	     */
-		2014500, 2320500, 2116500, 2524500, 1500000, 2218500,
+		2499000, 2499000, 2499000, 2499000, 1500000, 2499000,
 };
 
 static struct cpu_cvb_dvfs cpu_cvb_dvfs_table[] = {
@@ -164,7 +164,7 @@ static struct cpu_cvb_dvfs cpu_cvb_dvfs_table[] = {
 			.tune_high_min_millivolts = 900,
 			.min_millivolts = 750,
 		},
-		.max_mv = 1260,
+		.max_mv = 1400,
 		.freqs_mult = KHZ,
 		.speedo_scale = 100,
 		.voltage_scale = 1000,
@@ -185,7 +185,7 @@ static struct cpu_cvb_dvfs cpu_cvb_dvfs_table[] = {
 			.tune_high_min_millivolts = 900,
 			.min_millivolts = 720,
 		},
-		.max_mv = 1260,
+		.max_mv = 1400,
 		.freqs_mult = KHZ,
 		.speedo_scale = 100,
 		.voltage_scale = 1000,
