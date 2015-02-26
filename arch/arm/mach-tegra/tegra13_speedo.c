@@ -153,11 +153,7 @@ void tegra_init_speedo_data(void)
 	soc_iddq_value = tegra_fuse_readl(FUSE_SOC_IDDQ);
 	gpu_iddq_value = tegra_fuse_readl(FUSE_GPU_IDDQ);
 
-#ifdef CONFIG_TEGRA_CPU_CAP_OVERCLOCK
-    cpu_speedo_value = 2500;
-#else
 	cpu_speedo_value = cpu_speedo_0_value;
-#endif
 
 	if (cpu_speedo_value == 0) {
 		cpu_speedo_value = 2100;
