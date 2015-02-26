@@ -823,7 +823,6 @@ static int comm_init(void)
 	comm_ctx.params_ok = 0;
 	comm_ctx.process_pid = 0;
 	comm_ctx.nr_users = 0;
-	comm_ctx.tmp_buf = NULL;
 
 	init_waitqueue_head(&comm_ctx.read_wait);
 
