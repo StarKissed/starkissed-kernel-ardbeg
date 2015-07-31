@@ -9,28 +9,25 @@ PROPER=`echo $1 | sed 's/\([a-z]\)\([a-zA-Z0-9]*\)/\u\1\2/g'`
 HANDLE=LoungeKatt
 KERNELREPO=$DROPBOX_SERVER/TwistedServer/StarKissed/kernels
 TOOLCHAIN_PREFIX=/Volumes/android/android-toolchain-eabi-4.7/bin/arm-eabi-
-MODULEOUT=buildimg/boot.img-ramdisk
+MODULEOUT=starkissed/system
 GOOSERVER=loungekatt@upload.goo.im:public_html
 PUNCHCARD=`date "+%m-%d-%Y_%H.%M"`
 
-zipfile=$HANDLE"_StarKissed-LP50-Ardberg.zip"
+zipfile=$HANDLE"_StarKissed-LP50-TN8[Auto].zip"
 
 # CPU_JOB_NUM=`grep processor /proc/cpuinfo|wc -l`
 CORES=`sysctl -a | grep machdep.cpu | grep core_count | awk '{print $2}'`
 THREADS=`sysctl -a | grep machdep.cpu | grep thread_count | awk '{print $2}'`
 CPU_JOB_NUM=$((($CORES * $THREADS) / 2))
 
-if [ -e .config ]; then
-rm -rf .config
-fi
-if [ -e buildimg/boot.img ]; then
-rm -rf buildimg/boot.img
-fi
-if [ -e buildimg/newramdisk.cpio.gz ]; then
-rm -rf buildimg/newramdisk.cpio.gz
+if [ -e buildimg/tegra124-tn8.dtb ]; then
+rm -rf buildimg/tegra124-tn8.dtb
 fi
 if [ -e buildimg/zImage ]; then
 rm -rf buildimg/zImage
+fi
+if [ -e arch/arm/boot/zImage ]; then
+rm -rf arch/arm/boot/zImage
 fi
 if [ -e skrecovery/$zipfile ];then
 rm -rf skrecovery/$zipfile
@@ -71,20 +68,17 @@ if [ -e arch/arm/boot/zImage ]; then
     cp -r arch/arm/boot/dts/tegra124-tn8-p1761-1270-a04-e-battery.dtb buildimg/tegra124-tn8.dtb
     cp -r arch/arm/boot/zImage buildimg/zImage
 
+    KENRELZIP="StarKissed-LP50_$PUNCHCARD-TN8[Auto].zip"
     cd buildimg
-    ./img.sh
+    ./img.sh wifi
+    cp -R boot.img ../starkissed/kernel/wx_na_wf
+    ./img.sh ltea
+    cp -R boot.img ../starkissed/kernel/wx_na_do
+    ./img.sh lteu
+    cp -R boot.img ../starkissed/kernel/wx_un_do
     cd ../
 
-    IMAGEFILE=boot-lp.$PUNCHCARD.img
-    KENRELZIP="StarKissed-LP50_$PUNCHCARD-Ardberg.zip"
-
-    cp -r  buildimg/boot.img $KERNELREPO/shieldtablet/boot-50.img
-    cp -r  $KERNELREPO/shieldtablet/boot-50.img ~/.goo/$IMAGEFILE
-    scp ~/.goo/$IMAGEFILE $GOOSERVER/shieldtablet/kernel
-    rm -R ~/.goo/$IMAGEFILE
-
     echo "building boot package"
-    cp -R buildimg/boot.img starkissed
     cd starkissed
     rm *.zip
     zip -r $zipfile *
